@@ -34,12 +34,12 @@ public class ColorService : MonoBehaviour
             color = new Vector4(1, 1, 1, 1);
         }
         // blue
-        else if (hue >= 41000 & hue < 47000)
+        else if (hue >= 41000 & hue < 49000)
         {
             color = new Vector4(0, 0, 1, 1);
         }
         // indigo
-        else if (hue >= 47000 & hue < 53500)
+        else if (hue >= 49000 & hue < 53500)
         {
             color = new Vector4(0.3f, 0, 0.5f, 1);
         }
