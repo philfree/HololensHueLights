@@ -79,10 +79,7 @@ public class HueLightsAction : MonoBehaviour {
                 Debug.Log("lamp after: " + lamp.devicePath + " : " + lamp.on);
 
             }
-
-
-
         }
-
     }
+
 }

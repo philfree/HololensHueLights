@@ -17,17 +17,22 @@ public class HueBridgeManager : MonoBehaviour {
 
     public UnityWebRequest lights_json;
     List<SmartLight> smartLights = null;
+    MockSmartLights mockLights;
+
 
     void Awake()
     {
-            smartLights = new List<SmartLight>();
+        //smartLights = new List<SmartLight>();
     }
     void Start () {
-        if ((!bridgeip.Equals("127.0.0.1")) && (!username.Equals("newdeveloper")))
-        {
-            Debug.Log("co called");
-            StartCoroutine(DiscoverLights(convertLightData));
-        }
+        mockLights = new MockSmartLights();
+        smartLights = mockLights.getLights();
+        convertLightData();
+        //if ((!bridgeip.Equals("127.0.0.1")) && (!username.Equals("newdeveloper")))
+        //{
+        //    Debug.Log("co called");
+        //    StartCoroutine(DiscoverLights(convertLightData));
+        //}
     }
 
     //public IEnumerator DiscoverLights()
@@ -70,38 +75,18 @@ public class HueBridgeManager : MonoBehaviour {
     //    }
     //}
 
-    public IEnumerator DiscoverLights(Action action)
+    public IEnumerator DiscoverLights(Action nextAction)
     {
-        //HttpWebRequest request = (HttpWebRequest)WebRequest.Create();
-        //HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-
         lights_json = UnityWebRequest.Get("http://" + bridgeip + "/api/" + username + "/lights");
+        Debug.Log(lights_json.error);
         yield return lights_json.Send();
-        action();
+        nextAction();
 
-        //Debug.Log("http" + bridgeip + portNumber + "/api/" + username + "/lights");
-
-        //System.IO.Stream stream = response.GetResponseStream();
-       // System.IO.StreamReader streamReader = new System.IO.StreamReader(stream, System.Text.Encoding.UTF8);
+        Debug.Log("http" + bridgeip + portNumber + "/api/" + username + "/lights");
 
         //var lights = (Dictionary<string, object>)Json.Deserialize(lights_json.downloadHandler.text);
         //foreach (string key in lights.Keys)
         //{
-        //    var light = (Dictionary<string, object>)lights[key];
-        //    var state = (Dictionary<string, dynamic>)light["state"];
-
-        //    SmartLightState smartLightState = new SmartLightState(
-        //        Convert.ToBoolean(state["on"]),
-        //        Convert.ToInt32(state["bri"]),
-        //        Convert.ToInt32(state["hue"]),
-        //        Convert.ToInt32(state["sat"]),
-        //        Convert.ToString(state["effect"]),
-        //        Convert.ToString(state["alert"])
-        //        );
-
-        //    smartLights.Add(new SmartLight(light["name"].ToString(), light["modelid"].ToString(), smartLightState));
-        //    Debug.Log("inside co now");
-        //    yield return smartLights;
 
         //    //foreach (HueLamp hueLamp in GetComponentsInChildren<HueLamp>())
         //    //{
@@ -147,25 +132,30 @@ public class HueBridgeManager : MonoBehaviour {
 
     void convertLightData()
     {
-        var lights = (Dictionary<string, object>)Json.Deserialize(lights_json.downloadHandler.text);
-        foreach (string key in lights.Keys)
-        {
-            var light = (Dictionary<string, object>)lights[key];
-            var state = (Dictionary<string, dynamic>)light["state"];
+        //var lights = (Dictionary<string, object>)Json.Deserialize(lights_json.downloadHandler.text);
+        //foreach (string key in lights.Keys)
+        //{
+        //    // init state types
+        //    bool on;
+        //    int bri, hue, sat;
+        //    string effect, alert;
 
-            SmartLightState smartLightState = new SmartLightState(
-                Convert.ToBoolean(state["on"]),
-                Convert.ToInt32(state["bri"]),
-                Convert.ToInt32(state["hue"]),
-                Convert.ToInt32(state["sat"]),
-                Convert.ToString(state["effect"]),
-                Convert.ToString(state["alert"])
-                );
-            //Debug.Log(state["bri"]);
+        //    //Debug.Log("made it to the foreach loop "+ key);
 
-            smartLights.Add(new SmartLight(light["name"].ToString(), light["modelid"].ToString(), smartLightState));
-            //Debug.Log("should be first");
-        }
+        //    var light = (Dictionary<string, object>)lights[key];
+        //    var state = (Dictionary<string, dynamic>)light["state"];
+
+        //    // converting needs to be done prior to instantiating new SmartLightState
+        //    on = Convert.ToBoolean(state["on"]);
+        //    bri = Convert.ToInt32(state["bri"]);
+        //    hue = Convert.ToInt32(state["hue"]);
+        //    sat = Convert.ToInt32(state["sat"]);
+        //    effect = Convert.ToString(state["effect"]);
+        //    alert = Convert.ToString(state["alert"]);
+
+        //    SmartLightState smartLightState = new SmartLightState(on, bri, hue, sat, effect, alert);
+        //    smartLights.Add(new SmartLight(light["name"].ToString(), light["modelid"].ToString(), smartLightState));
+        //}
         SendMessage("createLights", smartLights);
     }
 }

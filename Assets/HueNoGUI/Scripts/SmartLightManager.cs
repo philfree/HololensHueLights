@@ -8,7 +8,6 @@ public class SmartLightManager : MonoBehaviour
     public List<SmartLight> lights;
     ColorService colorService;
 
-    // replace with real call when Hue bridge available
     HueBridgeManager hueBridgeManager;
 
     GameObject lightCollection;
@@ -26,11 +25,9 @@ public class SmartLightManager : MonoBehaviour
 
     void Start()
     {
+        lights = new List<SmartLight>();
         colorService = new ColorService();
-        //lights = smartLightManager.getLights();
-
         lightPrefab = Resources.Load("Prefabs/SmartBulb");
-        //InstantiateLights();
     }
 
     void Update()
@@ -40,11 +37,11 @@ public class SmartLightManager : MonoBehaviour
 
     public void createLights(List<SmartLight> lc)
     {
-        Debug.Log("create has been reached");
-        lights = new List<SmartLight>();
         lights = lc;
         InstantiateLights();
     }
+
+    // creates smart light game objects and sets color of prefab
     void InstantiateLights()
     {
         lightCollection = new GameObject("LightCollection");
@@ -55,8 +52,6 @@ public class SmartLightManager : MonoBehaviour
 
         foreach (SmartLight light in lights)
         {
-            Debug.Log(lights.Count);
-            Debug.Log(light.getState().getHue());
             lightObject = Instantiate(lightPrefab, pos, rotation);
             lightObject.name = light.getName();
 
@@ -70,7 +65,7 @@ public class SmartLightManager : MonoBehaviour
             rend.material.color = ledColor;
 
             currentLight.GetComponent<Renderer>().enabled = true;
-            pos += new Vector3(1, 0, 0);
+            pos += new Vector3(1, 0.2f, 0);
         }
     }
 
@@ -92,15 +87,4 @@ public class SmartLightManager : MonoBehaviour
             }
         }
     }
-
-
-    public void printLights()
-    {
-        foreach (SmartLight light in lights)
-        {
-            //Debug.Log(light.name);
-        }
-    }
-
-
 }
