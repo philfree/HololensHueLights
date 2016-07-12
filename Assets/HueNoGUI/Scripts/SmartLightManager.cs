@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Networking;
 
 public class SmartLightManager : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class SmartLightManager : MonoBehaviour
     HueBridgeManager hueBridgeManager;
 
     GameObject lightCollection;
+    List<SmartLight> smartLights;
     bool showLights;
 
     Object lightObject;
@@ -57,6 +59,7 @@ public class SmartLightManager : MonoBehaviour
 
             // gets newly instantiated GameObject and sets to child of LightCollection 
             GameObject currentLight = GameObject.Find(light.getName());
+            //currentLight.AddComponent<SetLightStateAction>();
             currentLight.transform.parent = lightCollection.transform;
 
             // sets color of light prefab based on current light hue state
@@ -64,8 +67,11 @@ public class SmartLightManager : MonoBehaviour
             Vector4 ledColor = colorService.GetColorByHue(light.getState().hue);
             rend.material.color = ledColor;
 
-            currentLight.GetComponent<Renderer>().enabled = true;
-            pos += new Vector3(1, 0.2f, 0);
+            if (!ActivityStateManager.Instance.IsEditMode)
+            {
+                rend.enabled = false;
+            }
+            pos += new Vector3(1, 0, 0);
         }
     }
 
@@ -86,5 +92,48 @@ public class SmartLightManager : MonoBehaviour
                 child.GetComponent<Renderer>().enabled = false;
             }
         }
+    }
+
+    List<SmartLight> getSmartLightList()
+    {
+        HueBridgeManager bridge = GetComponentInParent<HueBridgeManager>();
+        return bridge.GetLightCollection();
+    }
+
+    private IEnumerator updateLight(int lightID)
+    {
+        HueBridgeManager bridge = GetComponentInParent<HueBridgeManager>();
+
+        //UnityWebRequest www = UnityWebRequest.Put("http://" + bridge.bridgeip + "/api/" + bridge.username + "/lights/" + devicePath + "/state", jsonData);
+
+        SmartLightState testState = lights[lightID].getState();
+        testState.isOn(false);
+
+        string request = "http://" + bridge.bridgeip + "/api/" + bridge.username + "/lights/" + lightID.ToString() + "/state";
+        Debug.Log("Send triggered to " + request);
+
+        // converts List into json string. String able to be passed as body on PUT request
+        string json = JsonUtility.ToJson(testState);
+
+        UnityWebRequest www = UnityWebRequest.Put(request, json);
+        yield return www.Send();
+    }
+
+    public void UpdateLight(int lightId)
+    {
+        StartCoroutine(updateLight(lightId));
+    }
+
+    public void LightOff(int lightID)
+    {
+        Debug.Log("light off triggered: " + lightID);
+        lights[lightID].getState().isOn(false);
+        UpdateLight(lightID);
+    }
+    public void LightOn(int lightID)
+    {
+        Debug.Log("light on triggered");
+        lights[lightID].getState().isOn(true);
+        UpdateLight(lightID);
     }
 }

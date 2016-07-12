@@ -93,6 +93,37 @@ public class PositionLight : MonoBehaviour
                 }
                 if (currentState == EditState.Adjusting)
                 {
+                    var headPosition = Camera.main.transform.position;
+                    var gazeDirection = Camera.main.transform.forward;
+
+                    //int layerMask = 1 << 8;
+
+                    RaycastHit hitInfo;
+                    if (Physics.Raycast(headPosition, gazeDirection, out hitInfo,
+                        30.0f, SpatialMappingManager.Instance.LayerMask))
+                    {
+                        anchor = hitInfo.point;
+                        anchorNormal = hitInfo.normal;
+
+                        Debug.Log("here is the anchorNormal " + anchorNormal);
+
+                        adjustmentPlane.transform.position = hitInfo.point;
+                        planeIsHorizontal = isPlaneHorizontal(anchorNormal);
+                        Debug.Log("plane is horizontal? " + planeIsHorizontal);
+                        if (!planeIsHorizontal)
+                        {
+                            adjustmentPlane.transform.localScale = new Vector3(
+                            adjustmentPlane.transform.localScale.y,
+                            adjustmentPlane.transform.localScale.x,
+                            0.001f);
+                        }
+                        anchorSet = true;
+                        // Rotate this object to face the user.
+                        //Quaternion toQuat = Camera.main.transform.localRotation;
+                        //toQuat.x = 0;
+                        //toQuat.z = 0;
+                        //this.transform.rotation = toQuat;
+                    }
                     Debug.Log("CurrState is Adjusting");
                     adjustmentPlane.SetActive(true);
                 }
@@ -159,25 +190,25 @@ public class PositionLight : MonoBehaviour
             if (Physics.Raycast(headPosition, gazeDirection, out hitInfo,
                 30.0f, layerMask))
             {
-                if (!anchorSet)
-                {
-                    anchor = hitInfo.point;
-                    anchorNormal = hitInfo.normal;
+                //if (!anchorSet)
+                //{
+                //    anchor = hitInfo.point;
+                //    anchorNormal = hitInfo.normal;
 
-                    Debug.Log("here is the anchorNormal " + anchorNormal);
+                //    Debug.Log("here is the anchorNormal " + anchorNormal);
 
-                    adjustmentPlane.transform.position = hitInfo.point;
-                    planeIsHorizontal = isPlaneHorizontal(anchorNormal);
-                    Debug.Log("plane is horizontal? " + planeIsHorizontal);
-                    if (!planeIsHorizontal)
-                    {
-                        adjustmentPlane.transform.localScale = new Vector3(
-                        adjustmentPlane.transform.localScale.y,
-                        adjustmentPlane.transform.localScale.x,
-                        0.001f);
-                    }
-                    anchorSet = true;
-                }
+                //    adjustmentPlane.transform.position = hitInfo.point;
+                //    planeIsHorizontal = isPlaneHorizontal(anchorNormal);
+                //    Debug.Log("plane is horizontal? " + planeIsHorizontal);
+                //    if (!planeIsHorizontal)
+                //    {
+                //        adjustmentPlane.transform.localScale = new Vector3(
+                //        adjustmentPlane.transform.localScale.y,
+                //        adjustmentPlane.transform.localScale.x,
+                //        0.001f);
+                //    }
+                //    anchorSet = true;
+                //}
                 if (planeIsHorizontal)
                 {
                     this.transform.position = new Vector3(anchor.x, hitInfo.point.y, anchor.z);
