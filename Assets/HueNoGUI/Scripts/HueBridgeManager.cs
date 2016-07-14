@@ -81,6 +81,7 @@ public class HueBridgeManager : MonoBehaviour {
         lights_json = UnityWebRequest.Get("http://" + bridgeip + "/api/" + username + "/lights");
         Debug.Log(lights_json.error);
         yield return lights_json.Send();
+        Debug.Log(Json.Deserialize(JsonUtility.ToJson(lights_json)));
         nextAction();
 
         Debug.Log("http" + bridgeip + portNumber + "/api/" + username + "/lights");
@@ -131,10 +132,10 @@ public class HueBridgeManager : MonoBehaviour {
         {
             // init state types
             bool on;
-            int bri, hue, sat;
+            int id, bri, hue, sat;
             string effect, alert;
 
-            Debug.Log("made it to the foreach loop "+ key);
+            //Debug.Log("made it to the foreach loop "+ key);
 
             var light = (Dictionary<string, object>)lights[key];
             var state = (Dictionary<string, dynamic>)light["state"];
@@ -147,10 +148,16 @@ public class HueBridgeManager : MonoBehaviour {
             effect = Convert.ToString(state["effect"]);
             alert = Convert.ToString(state["alert"]);
 
+            id = Convert.ToInt32(key);
+
             SmartLightState smartLightState = new SmartLightState(on, bri, hue, sat, effect, alert);
-            smartLights.Add(new SmartLight(light["name"].ToString(), light["modelid"].ToString(), smartLightState));
+            smartLights.Add(new SmartLight(id, light["name"].ToString(), light["modelid"].ToString(), smartLightState));
         }
         SendMessage("createLights", smartLights);
+
+        // Wait till response from API to register voice control
+        VoiceService voiceService = gameObject.GetComponent<VoiceService>();
+        voiceService.RegisterPhrases();
     }
 
     public void TestPut()

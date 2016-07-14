@@ -5,6 +5,7 @@ public class ColorService : MonoBehaviour
 {
 
     Vector4 color;
+    int hueValue;
 
     public Vector4 GetColorByHue(int hue)
     {
@@ -55,6 +56,49 @@ public class ColorService : MonoBehaviour
         }
 
         return color;
+
+    }
+
+    public int GetHueByColor(string color)
+    {
+        // red
+        if (color == "Red")
+        {
+            hueValue = 0;
+        }
+
+        // yellow
+        else if (color == "Yellow")
+        {
+            hueValue = 12750;
+        }
+        // green
+        else if (color == "Green")
+        {
+            hueValue = 25500;
+        }
+        // white
+        else if (color == "White")
+        {
+            hueValue = 35000;
+        }
+        // blue
+        else if (color == "Blue")
+        {
+            hueValue = 46950;
+        }
+        // indigo
+        else if (color == "Purple")
+        {
+            hueValue = 56100;
+        }
+        // pink
+        else if (color == "Pink")
+        {
+            hueValue = 56100;
+        }
+
+        return hueValue;
 
     }
 }

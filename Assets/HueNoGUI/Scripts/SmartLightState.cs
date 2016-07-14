@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[System.Serializable]
 public class SmartLightState
 {
 
@@ -68,7 +69,7 @@ public class SmartLightState
 
     public void setHue(int setHue)
     {
-        bri = setHue;
+        hue = setHue;
     }
 
     public void setSat(int setSat)

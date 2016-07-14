@@ -1,15 +1,22 @@
 ﻿using UnityEngine;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using HoloToolkit.Unity;
 using UnityEngine.Networking;
+using UnityEngine.Windows.Speech;
+
+using MiniJSON;
 
 public class SmartLightManager : MonoBehaviour
 {
-
     public List<SmartLight> lights;
     ColorService colorService;
 
     HueBridgeManager hueBridgeManager;
+
+    KeywordRecognizer keywordRecognizer = null;
+    Dictionary<string, System.Action> keywords = new Dictionary<string, System.Action>();
 
     GameObject lightCollection;
     List<SmartLight> smartLights;
@@ -69,7 +76,7 @@ public class SmartLightManager : MonoBehaviour
 
             if (!ActivityStateManager.Instance.IsEditMode)
             {
-                rend.enabled = false;
+                rend.enabled = true;
             }
             pos += new Vector3(1, 0, 0);
         }
@@ -94,30 +101,33 @@ public class SmartLightManager : MonoBehaviour
         }
     }
 
-    List<SmartLight> getSmartLightList()
+    public List<SmartLight> getSmartLightList()
     {
-        HueBridgeManager bridge = GetComponentInParent<HueBridgeManager>();
-        return bridge.GetLightCollection();
+        Debug.Log("I was called");
+        return lights;
     }
 
     private IEnumerator updateLight(int lightID)
     {
         HueBridgeManager bridge = GetComponentInParent<HueBridgeManager>();
 
+        //string on, bri, hue, sat, effect, alert;
+
         //UnityWebRequest www = UnityWebRequest.Put("http://" + bridge.bridgeip + "/api/" + bridge.username + "/lights/" + devicePath + "/state", jsonData);
 
-        SmartLightState testState = lights[lightID].getState();
-        testState.isOn(false);
+        SmartLightState state = lights[lightID].getState();
 
         string request = "http://" + bridge.bridgeip + "/api/" + bridge.username + "/lights/" + lightID.ToString() + "/state";
         Debug.Log("Send triggered to " + request);
 
-        // converts List into json string. String able to be passed as body on PUT request
-        string json = JsonUtility.ToJson(testState);
+        string json = JsonUtility.ToJson(state);
+        Debug.Log("here is the json being sent " + json);
 
         UnityWebRequest www = UnityWebRequest.Put(request, json);
         yield return www.Send();
     }
+ 
+
 
     public void UpdateLight(int lightId)
     {
@@ -134,6 +144,17 @@ public class SmartLightManager : MonoBehaviour
     {
         Debug.Log("light on triggered");
         lights[lightID].getState().isOn(true);
+        UpdateLight(lightID);
+    }
+    public void UpdateColor(int lightID, int hue)
+    {
+        SmartLightState currentState;
+        Debug.Log("UpdateColor has been called" + hue);
+
+        currentState = lights[lightID].getState();
+        currentState.setHue(hue);
+        currentState.setSat(254);
+        Debug.Log("here is the hue --> " + lights[lightID].getState().getHue());
         UpdateLight(lightID);
     }
 }

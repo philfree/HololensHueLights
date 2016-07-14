@@ -6,19 +6,26 @@ public class SmartLight
 {
     public SmartLight()
     {
+        id = 0;
         name = "";
         modelid = "";
         state = null;
     }
 
-    public SmartLight(string name, string modelid, SmartLightState state)
+    public SmartLight(int id, string name, string modelid, SmartLightState state)
     {
+        this.id = id;
         this.name = name;
         this.modelid = modelid;
         this.state = state;
     }
 
     //Accessor Functions
+    public int getID()
+    {
+        return id;
+    }
+
     public string getName()
     {
         return name;
@@ -35,6 +42,7 @@ public class SmartLight
         return state;
     }
 
+    private int id;
     private string name;
     private string modelid;
     private SmartLightState state;
