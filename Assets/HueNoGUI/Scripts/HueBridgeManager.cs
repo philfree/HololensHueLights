@@ -79,9 +79,9 @@ public class HueBridgeManager : MonoBehaviour {
     public IEnumerator DiscoverLights(Action nextAction)
     {
         lights_json = UnityWebRequest.Get("http://" + bridgeip + "/api/" + username + "/lights");
-        Debug.Log(lights_json.error);
+        Debug.Log("Hue Response Errors: " + lights_json.error);
         yield return lights_json.Send();
-        Debug.Log(Json.Deserialize(JsonUtility.ToJson(lights_json)));
+
         nextAction();
 
         Debug.Log("http" + bridgeip + portNumber + "/api/" + username + "/lights");

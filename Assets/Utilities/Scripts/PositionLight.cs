@@ -4,18 +4,10 @@ using HoloToolkit.Unity;
 
 public class PositionLight : MonoBehaviour
 {
-
     private bool isEditing;
 
-    //private bool placing;
-    //private bool adjusting = true;
-    //private bool columnCollExist;
+    AnchorHologram worldAnchor;
 
-    //GameObject adjustmentPlane;
-    //Object adjPlanePrefab;
-
-    //Object colliderObject;
-    //Object colliderPrefab;
     Vector3 lightPosition;
 
     GameObject adjustmentPlane;
@@ -27,6 +19,7 @@ public class PositionLight : MonoBehaviour
     public bool anchorSet;
     public Vector3 anchor;
     public Vector3 anchorNormal;
+
     private bool planeIsHorizontal;
 
     // object for debugging on Unity
@@ -50,6 +43,8 @@ public class PositionLight : MonoBehaviour
         adjustmentPlane = Instantiate(adjPlanePrefab, transform.position, transform.rotation) as GameObject;
         // MOCK if set to "true"
         adjustmentPlane.SetActive(false);
+
+        worldAnchor = GetComponent<AnchorHologram>();
 
        // MOCK
        //planeIsHorizontal = false;
@@ -89,6 +84,7 @@ public class PositionLight : MonoBehaviour
 
                 if (currentState == EditState.Placing)
                 {
+                    worldAnchor.RemoveLightAnchor();
                     Debug.Log("CurrState is Placing");
                 }
                 if (currentState == EditState.Adjusting)
@@ -131,41 +127,9 @@ public class PositionLight : MonoBehaviour
                 {
                     anchorSet = false;
                     adjustmentPlane.SetActive(false);
+                    worldAnchor.SaveLightLocation();
                     Debug.Log("CurrState is Idle");
                 }
-                //if (currentState == EditState.Idle)
-                //{
-
-                //    currentState = EditState.Idle;
-                //    var headPosition = Camera.main.transform.position;
-                //    var gazeDirection = Camera.main.transform.forward;
-
-                //    RaycastHit hitInfo;
-                //    if (Physics.Raycast(headPosition, gazeDirection, out hitInfo,
-                //        30.0f))
-                //    {
-                //        Debug.Log("hitPoint set " + hitInfo.point);
-                //        anchor = hitInfo.point;
-                //        currentState = EditState.Placing;
-                //        //SpatialMappingManager.Instance.DrawVisualMeshes = true;
-                //        getCurrentState();
-                //        SendMessageUpwards("SetAdjPlane", anchor);
-                //    }
-
-                //}
-                //else if (currentState == EditState.Placing)
-                //{
-                //    currentState = EditState.Adjusting;
-                //    getCurrentState();
-                //    Debug.Log("state changed to " + currentState);
-                //}
-                //else if (currentState == EditState.Adjusting)
-                //{
-                //    //SpatialMappingManager.Instance.DrawVisualMeshes = false;
-                //    currentState = EditState.Idle;
-                //    getCurrentState();
-                //    SendMessageUpwards("DeactivateAdjPlane");
-                //}
             }
             else
             {
@@ -190,25 +154,6 @@ public class PositionLight : MonoBehaviour
             if (Physics.Raycast(headPosition, gazeDirection, out hitInfo,
                 30.0f, layerMask))
             {
-                //if (!anchorSet)
-                //{
-                //    anchor = hitInfo.point;
-                //    anchorNormal = hitInfo.normal;
-
-                //    Debug.Log("here is the anchorNormal " + anchorNormal);
-
-                //    adjustmentPlane.transform.position = hitInfo.point;
-                //    planeIsHorizontal = isPlaneHorizontal(anchorNormal);
-                //    Debug.Log("plane is horizontal? " + planeIsHorizontal);
-                //    if (!planeIsHorizontal)
-                //    {
-                //        adjustmentPlane.transform.localScale = new Vector3(
-                //        adjustmentPlane.transform.localScale.y,
-                //        adjustmentPlane.transform.localScale.x,
-                //        0.001f);
-                //    }
-                //    anchorSet = true;
-                //}
                 if (planeIsHorizontal)
                 {
                     this.transform.position = new Vector3(anchor.x, hitInfo.point.y, anchor.z);
@@ -242,7 +187,6 @@ public class PositionLight : MonoBehaviour
         // update the placement to match the user's gaze.
         if (currentState == EditState.Placing)
         {
-            Debug.Log("asdfadsfj;lads;jlfk");
             // Do a raycast into the world that will only hit the Spatial Mapping mesh.
             var headPosition = Camera.main.transform.position;
             var gazeDirection = Camera.main.transform.forward;
@@ -253,7 +197,7 @@ public class PositionLight : MonoBehaviour
             {
                 isPlaneHorizontal(hitInfo.normal);
                 this.transform.position = hitInfo.point;
-                Debug.Log("this is hit normal in OnSelect Placing: " + hitInfo.normal);
+
                 // Rotate this object to face the user.
                 Quaternion toQuat = Camera.main.transform.localRotation;
                 toQuat.x = 0;
@@ -261,41 +205,6 @@ public class PositionLight : MonoBehaviour
                 this.transform.rotation = toQuat;
             }
         }
-
-        //if (currentState == EditState.Adjusting)
-        //{
-        //    RaycastHit hitInfo;
-        //    //float targetDistance;
-
-        //    Vector3 headPosition = Camera.main.transform.position;
-        //    Vector3 gazeDirection = Camera.main.transform.forward;
-
-        //    Physics.Raycast(headPosition, gazeDirection, out hitInfo,
-        //        30.0f, SpatialMappingManager.Instance.LayerMask);
-
-        //    float angleA = Vector3.Angle(anchor, gazeDirection);
-        //    float angleB = Vector3.Angle(gazeDirection, new Vector3(0, 1, 0));
-
-        //    float anchorDistanceFromCamera = Vector3.Distance(headPosition, anchor);
-        //    //Debug.Log("anchor dis cam " + anchorDistanceFromCamera);
-        //    // finds the distance to cast object along imaginary axis
-        //    // targetDistance = distanceFromAnchor(angleA, angleB, anchorDistanceFromCamera);
-        //    //Debug.Log("move on y is " + (targetDistance));
-        //    this.transform.position = new Vector3(anchor.x, hitInfo.point.y, anchor.z);
-        //    //if (Physics.Raycast(headPosition,  gazeDirection, out hitInfo,
-        //    //    30.0f))
-        //    //{
-        //    //    this.gameObject.transform.position = new Vector3();
-        //    //}
-
-        //    //if (Physics.Raycast(headPosition, gazeDirection, out hitInfo,
-        //    //    30.0f, SpatialMappingManager.Instance.LayerMask))
-        //    //{
-        //    //    this.gameObject.transform.position = new Vector3(gameObject.transform.position.x, hitInfo.point.y, gameObject.transform.position.z);
-        //    //    Debug.Log("hitpoint y: " + hitInfo.point.y);
-        //    //    //Debug.Log("coll name: " + hitInfo.collider.GetComponent<GameObject>().name);
-        //    //}
-        //}
     }
 
     bool isPlaneHorizontal(Vector3 normal)

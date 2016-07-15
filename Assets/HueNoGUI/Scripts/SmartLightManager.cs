@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using HoloToolkit.Unity;
 using UnityEngine.Networking;
 using UnityEngine.Windows.Speech;
+using UnityEngine.VR.WSA.Persistence;
 
 using MiniJSON;
 
