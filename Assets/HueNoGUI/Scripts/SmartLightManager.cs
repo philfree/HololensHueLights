@@ -111,12 +111,10 @@ public class SmartLightManager : MonoBehaviour
     private IEnumerator updateLight(int lightID)
     {
         HueBridgeManager bridge = GetComponentInParent<HueBridgeManager>();
+        // compensate for array indexing to prevent last light from being out of range
+        int adjustedID = (lightID - 1);
 
-        //string on, bri, hue, sat, effect, alert;
-
-        //UnityWebRequest www = UnityWebRequest.Put("http://" + bridge.bridgeip + "/api/" + bridge.username + "/lights/" + devicePath + "/state", jsonData);
-
-        SmartLightState state = lights[lightID].getState();
+        SmartLightState state = lights[adjustedID].getState();
 
         string request = "http://" + bridge.bridgeip + "/api/" + bridge.username + "/lights/" + lightID.ToString() + "/state";
         Debug.Log("Send triggered to " + request);
@@ -127,35 +125,48 @@ public class SmartLightManager : MonoBehaviour
         UnityWebRequest www = UnityWebRequest.Put(request, json);
         yield return www.Send();
     }
- 
-
 
     public void UpdateLight(int lightId)
     {
         StartCoroutine(updateLight(lightId));
     }
 
-    public void LightOff(int lightID)
-    {
-        Debug.Log("light off triggered: " + lightID);
-        lights[lightID].getState().isOn(false);
-        UpdateLight(lightID);
-    }
-    public void LightOn(int lightID)
-    {
-        Debug.Log("light on triggered");
-        lights[lightID].getState().isOn(true);
-        UpdateLight(lightID);
-    }
-    public void UpdateColor(int lightID, int hue)
+    public void UpdateState(int lightID, string param, int value)
     {
         SmartLightState currentState;
-        Debug.Log("UpdateColor has been called" + hue);
+        // compensate for array indexing to prevent last light from being out of range
+        int adjustedID = (lightID - 1);
 
-        currentState = lights[lightID].getState();
-        currentState.setHue(hue);
-        currentState.setSat(254);
-        Debug.Log("here is the hue --> " + lights[lightID].getState().getHue());
+        currentState = lights[adjustedID].getState();
+        if (param == "On")
+        {
+            currentState.isOn(true);
+        }
+        else if (param == "Off")
+        {
+            currentState.isOn(false);
+        }
+        else if (param == "hue")
+        {
+            currentState.setHue(value);
+            currentState.setSat(254);
+        }
+        else if (param == "bri")
+        {
+            currentState.setBri(value);
+        }
+        else if (param == "alert")
+        {
+            if (value == 0)
+            {
+                Debug.Log("OK phrase understood");
+                currentState.setAlert("none");
+            }
+            else
+            {
+                currentState.setAlert("lselect");
+            }
+        }
         UpdateLight(lightID);
     }
 }

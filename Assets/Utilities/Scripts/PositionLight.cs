@@ -205,6 +205,7 @@ public class PositionLight : MonoBehaviour
                 this.transform.rotation = toQuat;
             }
         }
+
     }
 
     bool isPlaneHorizontal(Vector3 normal)

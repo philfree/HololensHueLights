@@ -24,11 +24,18 @@ public class VoiceService : MonoBehaviour {
 
     List<SmartLight> lights;
 
+    [Tooltip("Brightness range 0 - 254 (Default: 160)")]
+    public int dimValue = 160;
+    [Tooltip("Brightness range 0 - 254 (Default: 80)")]
+    public int dimMoreValue = 80;
+
     void Start () {
     }
 
     public void RegisterPhrases()
     {
+
+        // called outside of Start() to ensure the SmartLightManager has been loaded first 
         smartLightManager = gameObject.GetComponent<SmartLightManager>();
         colorService = new ColorService();
 
@@ -36,166 +43,102 @@ public class VoiceService : MonoBehaviour {
         lights = smartLightManager.getSmartLightList();
 
         keywords = new Dictionary<string, System.Action>();
+
+        // On/Off commands
         keywords.Add("Light On", () =>
         {
-            var focusObject = GestureManager.Instance.FocusedObject;
-            if (focusObject != null)
-            {
-                Debug.Log("FO: " + focusObject);
-                foreach (SmartLight light in lights)
-                {
-                    if (light.getName() == focusObject.name)
-                    {
-                        Debug.Log("Match!!!: " + focusObject.name);
-                        smartLightManager.LightOn(light.getID());
-                    }
-                }
-            }
+            buildUpdateCall("On", 0);
         });
 
         keywords.Add("Light Off", () =>
         {
-            var focusObject = GestureManager.Instance.FocusedObject;
-            if (focusObject != null)
-            {
-                Debug.Log("FO: " + focusObject);
-                foreach (SmartLight light in lights)
-                {
-                    if (light.getName() == focusObject.name)
-                    {
-                        smartLightManager.LightOff(light.getID());
-                    }
-                }
-            }
+            buildUpdateCall("Off", 0);
         });
 
-        // TODO refactor to one phrase with color as the variable. This is not DRY...at all
+        // color change commands
         keywords.Add("Set To Red", () =>
         {
             int hue;
-            var focusObject = GestureManager.Instance.FocusedObject;
-            if (focusObject != null)
-            {
-                Debug.Log("FO: " + focusObject);
-                foreach (SmartLight light in lights)
-                {
-                    if (light.getName() == focusObject.name)
-                    {
-                        hue = colorService.GetHueByColor("Red");
-                        smartLightManager.UpdateColor(light.getID(), hue);
-                    }
-                }
-            }
+            hue = colorService.GetHueByColor("Red");
+
+            buildUpdateCall("hue", hue);
         });
 
         keywords.Add("Set To Yellow", () =>
         {
             int hue;
-            var focusObject = GestureManager.Instance.FocusedObject;
-            if (focusObject != null)
-            {
-                Debug.Log("FO: " + focusObject);
-                foreach (SmartLight light in lights)
-                {
-                    if (light.getName() == focusObject.name)
-                    {
-                        hue = colorService.GetHueByColor("Yellow");
-                        smartLightManager.UpdateColor(light.getID(), hue);
-                    }
-                }
-            }
+            hue = colorService.GetHueByColor("Yellow");
+
+            buildUpdateCall("hue", hue);
         });
 
         keywords.Add("Set To Green", () =>
         {
             int hue;
-            var focusObject = GestureManager.Instance.FocusedObject;
-            if (focusObject != null)
-            {
-                Debug.Log("FO: " + focusObject);
-                foreach (SmartLight light in lights)
-                {
-                    if (light.getName() == focusObject.name)
-                    {
-                        hue = colorService.GetHueByColor("Green");
-                        smartLightManager.UpdateColor(light.getID(), hue);
-                    }
-                }
-            }
+            hue = colorService.GetHueByColor("Green");
+
+            buildUpdateCall("hue", hue);
         });
 
         keywords.Add("Set To White", () =>
         {
             int hue;
-            var focusObject = GestureManager.Instance.FocusedObject;
-            if (focusObject != null)
-            {
-                Debug.Log("FO: " + focusObject);
-                foreach (SmartLight light in lights)
-                {
-                    if (light.getName() == focusObject.name)
-                    {
-                        hue = colorService.GetHueByColor("White");
-                        smartLightManager.UpdateColor(light.getID(), hue);
-                    }
-                }
-            }
+            hue = colorService.GetHueByColor("White");
+
+            buildUpdateCall("hue", hue);
         });
 
         keywords.Add("Set To Blue", () =>
         {
             int hue;
-            var focusObject = GestureManager.Instance.FocusedObject;
-            if (focusObject != null)
-            {
-                Debug.Log("FO: " + focusObject);
-                foreach (SmartLight light in lights)
-                {
-                    if (light.getName() == focusObject.name)
-                    {
-                        hue = colorService.GetHueByColor("Blue");
-                        smartLightManager.UpdateColor(light.getID(), hue);
-                    }
-                }
-            }
+            hue = colorService.GetHueByColor("Blue");
+
+            buildUpdateCall("hue", hue);
         });
 
         keywords.Add("Set To Purple", () =>
         {
             int hue;
-            var focusObject = GestureManager.Instance.FocusedObject;
-            if (focusObject != null)
-            {
-                Debug.Log("FO: " + focusObject);
-                foreach (SmartLight light in lights)
-                {
-                    if (light.getName() == focusObject.name)
-                    {
-                        hue = colorService.GetHueByColor("Purple");
-                        smartLightManager.UpdateColor(light.getID(), hue);
-                    }
-                }
-            }
+            hue = colorService.GetHueByColor("Purple");
+
+            buildUpdateCall("hue", hue);
         });
 
         keywords.Add("Set To Pink", () =>
         {
             int hue;
-            var focusObject = GestureManager.Instance.FocusedObject;
-            if (focusObject != null)
-            {
-                Debug.Log("FO: " + focusObject);
-                foreach (SmartLight light in lights)
-                {
-                    if (light.getName() == focusObject.name)
-                    {
-                        hue = colorService.GetHueByColor("Pink");
-                        smartLightManager.UpdateColor(light.getID(), hue);
-                    }
-                }
-            }
+            hue = colorService.GetHueByColor("Pink");
+
+            buildUpdateCall("hue", hue);
         });
 
+        // Brightness adjustment commands
+        keywords.Add("Dim Light", () =>
+        {
+            buildUpdateCall("bri", dimValue);
+        });
+
+        keywords.Add("Dim Light More", () =>
+        {
+            buildUpdateCall("bri", dimMoreValue);
+        });
+
+        keywords.Add("Full Brightness", () =>
+        {
+            buildUpdateCall("bri", 254);
+        });
+
+        // flashes the corresponding light of the currently focused gameObject
+        keywords.Add("Identify Light", () =>
+        {
+            buildUpdateCall("alert", 1);
+        });
+
+        // stops flashing of light prior to 15 second default time
+        keywords.Add("OK That's Enough", () =>
+        {
+            buildUpdateCall("alert", 0);
+        });
 
 
 
@@ -209,10 +152,21 @@ public class VoiceService : MonoBehaviour {
 
     }
 
-    // Update is called once per frame
-    void Update () {
-	
-	}
+    void buildUpdateCall(string param, int value)
+    {
+        var focusObject = GestureManager.Instance.FocusedObject;
+        if (focusObject != null)
+        {
+            Debug.Log("focused object: " + focusObject);
+            foreach (SmartLight light in lights)
+            {
+                if (light.getName() == focusObject.name)
+                {
+                    smartLightManager.UpdateState(light.getID(), param, value);
+                }
+            }
+        }
+    }
 
     private void KeywordRecognizer_OnPhraseRecognized(PhraseRecognizedEventArgs args)
     {
@@ -230,19 +184,6 @@ public class VoiceService : MonoBehaviour {
     // keyword testing functions
     public void MockFocusedItem()
     {
-        var focusObject = GestureManager.Instance.FocusedObject;
-        if (focusObject != null)
-        {
-            lights = smartLightManager.getSmartLightList();
-            Debug.Log("FO: " + focusObject);
-            foreach (SmartLight light in lights)
-            {
-                if (light.getName() == focusObject.name)
-                {
-                    Debug.Log("Match!!!: " + focusObject.name);
-                    smartLightManager.LightOn(light.getID());
-                }
-            }
-        }
+        buildUpdateCall("On", 0);
     }
 }
