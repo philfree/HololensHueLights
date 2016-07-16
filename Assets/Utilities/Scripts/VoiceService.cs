@@ -64,6 +64,14 @@ public class VoiceService : MonoBehaviour {
             buildUpdateCall("hue", hue);
         });
 
+        keywords.Add("Set To Orange", () =>
+        {
+            int hue;
+            hue = colorService.GetHueByColor("Orange");
+
+            buildUpdateCall("hue", hue);
+        });
+
         keywords.Add("Set To Yellow", () =>
         {
             int hue;

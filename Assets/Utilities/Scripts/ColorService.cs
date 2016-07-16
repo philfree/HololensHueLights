@@ -14,7 +14,7 @@ public class ColorService : MonoBehaviour
         {
             color = new Vector4(1, 0, 0, 1);
         }
-        // organge
+        // orange
         else if (hue >= 5000 & hue < 13000)
         {
             color = new Vector4(1, 0.65f, 0, 1);
@@ -66,7 +66,11 @@ public class ColorService : MonoBehaviour
         {
             hueValue = 0;
         }
-
+        // orange
+        if (color == "Orange")
+        {
+            hueValue = 9000;
+        }
         // yellow
         else if (color == "Yellow")
         {

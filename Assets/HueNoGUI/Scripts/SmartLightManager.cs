@@ -20,7 +20,7 @@ public class SmartLightManager : MonoBehaviour
     Dictionary<string, System.Action> keywords = new Dictionary<string, System.Action>();
 
     GameObject lightCollection;
-    List<SmartLight> smartLights;
+    //List<SmartLight> smartLights;
     bool showLights;
 
     Object lightObject;
@@ -124,6 +124,9 @@ public class SmartLightManager : MonoBehaviour
 
         UnityWebRequest www = UnityWebRequest.Put(request, json);
         yield return www.Send();
+
+        // updates the hologram UI to reflect changes to the real light
+        UpdateGameObjectMaterial(lightID);
     }
 
     public void UpdateLight(int lightId)
@@ -159,7 +162,6 @@ public class SmartLightManager : MonoBehaviour
         {
             if (value == 0)
             {
-                Debug.Log("OK phrase understood");
                 currentState.setAlert("none");
             }
             else
@@ -168,5 +170,19 @@ public class SmartLightManager : MonoBehaviour
             }
         }
         UpdateLight(lightID);
+    }
+
+    void UpdateGameObjectMaterial(int lightID)
+    {
+        foreach (SmartLight light in lights)
+        {
+            if (light.getID() == lightID)
+            {
+                GameObject currentLight = GameObject.Find(light.getName());
+                Renderer rend = currentLight.GetComponent<Renderer>();
+                Vector4 ledColor = colorService.GetColorByHue(light.getState().hue);
+                rend.material.color = ledColor;
+            }
+        }
     }
 }
