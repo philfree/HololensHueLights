@@ -104,7 +104,6 @@ public class SmartLightManager : MonoBehaviour
 
     public List<SmartLight> getSmartLightList()
     {
-        Debug.Log("I was called");
         return lights;
     }
 
@@ -170,6 +169,22 @@ public class SmartLightManager : MonoBehaviour
             }
         }
         UpdateLight(lightID);
+    }
+
+    public void SetLightsToDefault()
+    {
+        for (int i = 0; i < lights.Count; i++)
+        {
+            SmartLightState currentState;
+            currentState = lights[i].getState();
+            currentState.setHue(16000);
+            currentState.setBri(254);
+            currentState.setSat(150);
+            currentState.setAlert("none");
+            // compensate for index vs request id
+            UpdateLight(i + 1);
+        }
+
     }
 
     void UpdateGameObjectMaterial(int lightID)

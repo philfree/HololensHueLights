@@ -20,6 +20,7 @@ public class VoiceService : MonoBehaviour {
     KeywordRecognizer keywordRecognizer = null;
 
     SmartLightManager smartLightManager;
+    HelpMenuVoiceCommands vcMenu;
     ColorService colorService;
 
     List<SmartLight> lights;
@@ -30,6 +31,9 @@ public class VoiceService : MonoBehaviour {
     public int dimMoreValue = 80;
 
     void Start () {
+        GameObject menu = GameObject.Find("VoiceCommands");
+
+        vcMenu = menu.GetComponent<HelpMenuVoiceCommands>();
     }
 
     public void RegisterPhrases()
@@ -43,6 +47,12 @@ public class VoiceService : MonoBehaviour {
         lights = smartLightManager.getSmartLightList();
 
         keywords = new Dictionary<string, System.Action>();
+
+        // Global light commands
+        keywords.Add("Normal Lights", () =>
+        {
+            smartLightManager.SetLightsToDefault();
+        });
 
         // On/Off commands
         keywords.Add("Light On", () =>
@@ -148,7 +158,16 @@ public class VoiceService : MonoBehaviour {
             buildUpdateCall("alert", 0);
         });
 
+        // system voice commands
+        keywords.Add("Show Voice Menu", () =>
+        {
+            showVCMenu(true);
+        });
 
+        keywords.Add("Hide Voice Menu", () =>
+        {
+            showVCMenu(false);
+        });
 
         // Tell the KeywordRecognizer about our keywords.
         keywordRecognizer = new KeywordRecognizer(keywords.Keys.ToArray());
@@ -157,7 +176,8 @@ public class VoiceService : MonoBehaviour {
         keywordRecognizer.OnPhraseRecognized += KeywordRecognizer_OnPhraseRecognized;
         keywordRecognizer.Start();
 
-
+        // populates voice control help menu with available commands
+        buildMenu(keywords);
     }
 
     void buildUpdateCall(string param, int value)
@@ -176,6 +196,20 @@ public class VoiceService : MonoBehaviour {
         }
     }
 
+    void buildMenu(Dictionary<string, System.Action> vc)
+    {
+        HelpMenuVoiceCommands vcMenu;
+        GameObject menu = GameObject.Find("VoiceCommands");
+
+        vcMenu = menu.GetComponent<HelpMenuVoiceCommands>();
+        vcMenu.CreateVoiceControlMenu(vc);
+    }
+
+    void showVCMenu(bool show)
+    {
+        vcMenu.ShowVCMenu(show);
+    }
+
     private void KeywordRecognizer_OnPhraseRecognized(PhraseRecognizedEventArgs args)
     {
         System.Action keywordAction;
@@ -192,6 +226,13 @@ public class VoiceService : MonoBehaviour {
     // keyword testing functions
     public void MockFocusedItem()
     {
-        buildUpdateCall("On", 0);
+        
+    }
+
+    public void TestFunk()
+    {
+        showVCMenu(true);
+        //smartLightManager.SetLightsToDefault();
+        //StartCoroutine(GetFunky());
     }
 }
