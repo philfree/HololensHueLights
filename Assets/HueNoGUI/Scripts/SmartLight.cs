@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿// OLDER CLASS VERSION. May need if other scene is broken
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
